@@ -10,16 +10,18 @@
 </head>
 <body>
 <div id="app">
-  <nav class="tabbar" role="tablist" aria-label="Views">
-    <button class="tab" role="tab" id="tab-memory" type="button" aria-selected="true">Memory</button>
-    <button class="tab" role="tab" id="tab-practice" type="button" aria-selected="false">Practice</button>
-    <button class="tab" role="tab" id="tab-map" type="button" aria-selected="false">Contents</button>
-    <button class="tab" role="tab" id="tab-tests" type="button" aria-selected="false">Practice tests</button>
-    <button class="tab" role="tab" id="tab-settings" type="button" aria-selected="false">Settings</button>
-    <button class="tab" role="tab" id="tab-guide" type="button" aria-selected="false">Guide</button>
+  <header class="topbar">
     <span class="brand">Frames and Heap</span>
-  </nav>
-  <div class="testbar" id="testbar" hidden></div>
+    <nav class="tabbar" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-memory" type="button" aria-selected="true">Memory</button>
+      <button class="tab" role="tab" id="tab-practice" type="button" aria-selected="false">Practice</button>
+      <button class="tab" role="tab" id="tab-map" type="button" aria-selected="false">Contents</button>
+      <button class="tab" role="tab" id="tab-tests" type="button" aria-selected="false">Practice tests</button>
+      <button class="tab" role="tab" id="tab-settings" type="button" aria-selected="false">Settings</button>
+      <button class="tab" role="tab" id="tab-guide" type="button" aria-selected="false">Guide</button>
+    </nav>
+    <div class="testbar" id="testbar" hidden></div>
+  </header>
   <main>
     <div class="pause-cover" id="pause-cover" hidden><p>The test is paused, and the clock has stopped.</p><button class="btn" type="button" id="resume-btn">Resume</button></div>
     <section class="view on" id="view-memory" aria-label="Memory"></section>

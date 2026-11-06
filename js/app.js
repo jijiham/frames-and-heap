@@ -9,7 +9,7 @@
   const inline = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
   const DEFAULTS = {
-    theme: 'solarized-auto', customBase: 'solarized-light', customColors: {}, fontSize: 15, codeFont: 'theme', bodyFont: 'theme', layout: 'side', splitMem: 0.42, splitPrac: 0.42,
+    theme: 'solarized-auto', customBase: 'solarized-light', customColors: {}, fontSize: 14, codeFont: 'theme', bodyFont: 'theme', layout: 'side', splitMem: 0.42, splitPrac: 0.42,
     rules: 'main', addresses: true, predict: false, realCheck: true, seed: 42,
     hints: 'auto', memoryLinks: true, level: 'standard', randomTheme: 'off', suggestions: true, docsHover: true, playSpeed: 'normal',
     aiModel: 'opus-high', aiReview: 'ask', aiHints: 'ask', aiExplain: 'ask', aiExpert: 'ask', aiPractice: 'ask',
@@ -428,7 +428,7 @@
     // In the one-column layout both halves are the same element, so everything stacks in reading order.
     const side = settings().layout === 'side';
     const L = h('div', 'pane prac-left');
-    const R = side ? h('div', 'pane prac-right') : L;
+    const R = side ? h('div', 'pane stack prac-right') : L;
     const crumb = h('p', 'crumb');
     const un = UNIT_NO.get(it.unit);
     crumb.appendChild(h('span', null, it.unit.synthetic ? it.unit.title : it.type === 'read' ? 'Unit ' + un : 'Unit ' + un + ': ' + it.unit.title));
@@ -443,7 +443,7 @@
     if (it.type === 'read') renderRead(it, L, R);
     else if (it.type === 'trace') renderTrace(it, L, R);
     else renderWrite(it, L, R);
-    if (st === 'skipped' && it.type !== 'read' && !inTest(it.id)) { const row = h('div', 'actions'); harderButton(it, row); if (row.children.length) R.appendChild(row); }
+    if (st === 'skipped' && it.type !== 'read' && !inTest(it.id)) { const row = h('div', 'actions'); harderButton(it, row); if (row.children.length) L.appendChild(row); }
     const nav = h('p', 'navrow');
     const test = inTest(it.id);
     const p = test ? testNeighbor(-1) : neighbor(-1), n = test ? testNeighbor(1) : neighbor(1);
@@ -464,14 +464,23 @@
     return ed;
   }
 
+  // A rounded panel on the right side, with an optional title line; returns the panel element.
+  function panel(parent, title, cls) {
+    const p = h('div', 'panel' + (cls ? ' ' + cls : ''));
+    if (title) p.appendChild(h('div', 'panel-head', title));
+    parent.appendChild(p);
+    return p;
+  }
+
   function renderRead(it, L, R) {
     for (const para of it.unit.read) { const p = h('p'); p.innerHTML = inline(para); L.appendChild(p); }
-    S.prac.exEditor = codeBox(R, it.unit.example, true);
+    const P = panel(R, 'Example');
+    S.prac.exEditor = codeBox(P, it.unit.example, true);
     const acts = h('div', 'actions');
     if (settings().memoryLinks && !it.unit.dom && !it.unit.noRun) acts.appendChild(btn('Step through it in Memory', '', () => openInMemory(it.unit.example + '\n', it.id)));
     acts.appendChild(btn('Mark as read', 'sec', () => { setStatus(it.id, 'done'); nextItem(); }));
-    R.appendChild(acts);
-    if (it.unit.dom && !it.unit.noRun) pageBlock(R, null, it.id).run(it.unit.example);
+    P.appendChild(acts);
+    if (it.unit.dom && !it.unit.noRun) pageBlock(panel(R, null, 'grow'), null, it.id).run(it.unit.example);
   }
 
   // hints
@@ -526,12 +535,13 @@
 
   function renderTrace(it, L, R) {
     const ask = h('p'); ask.innerHTML = inline(it.ask || 'What does this print? Write one line for each printed line.'); L.appendChild(ask);
-    S.prac.exEditor = codeBox(R, it.code, true);
+    S.prac.exEditor = codeBox(panel(R, 'Program'), it.code, true);
+    const AP = panel(R, 'Your answer', 'grow');
     const ta = h('textarea', 'field answer'); ta.setAttribute('aria-label', 'Your answer, one line per printed line'); ta.spellcheck = false;
     const rec = Store.item(it.id);
     const saved = inTest() ? S.test.answers[it.id] : rec.lastAnswer;
     if (saved) ta.value = saved;
-    R.appendChild(ta);
+    AP.appendChild(ta);
     const hints = hintsBlock(it);
     const result = h('div');
     const acts = h('div', 'actions');
@@ -542,8 +552,8 @@
     let lastWrong = '';
     acts.appendChild(btn('Skip', 'sec', () => { if (inTest()) S.test.skipped[it.id] = true; else setStatus(it.id, 'skipped'); goNext(); }));
     if (allowMemory() && !expert() && !it.noTrace) acts.appendChild(btn('Show the answer in Memory', 'sec', () => openInMemory(it.code + '\n', it.id)));
-    R.appendChild(acts);
-    R.appendChild(result);
+    AP.appendChild(acts);
+    AP.appendChild(result);
     L.appendChild(hints.el);
     ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); doCheck(); } });
     ta.addEventListener('input', () => { if (inTest()) { S.test.answers[it.id] = ta.value; saveTest(); } });
@@ -628,7 +638,7 @@
     set(id, data) { try { const all = JSON.parse(localStorage.getItem(PAGE_STORE_KEY) || '{}'); all[id] = data; localStorage.setItem(PAGE_STORE_KEY, JSON.stringify(all)); } catch (e) {} },
   };
   function pageBlock(parent, prelude, storeId) {
-    const head = h('div', 'tests-head'); head.appendChild(h('span', null, 'The page'));
+    const head = h('div', 'panel-head'); head.appendChild(h('span', null, 'The page'));
     let lastCode = '';
     head.appendChild(linkBtn('Reload the page', () => api.run(lastCode)));
     head.appendChild(linkBtn('Clear its storage', () => { pageStore.set(storeId, {}); api.run(lastCode); }));
@@ -671,7 +681,9 @@
     const rec = Store.item(it.id);
     const starter = starterFor(it);
     const savedCode = inTest() ? S.test.codes[it.id] : Store.data.codes[it.id];
-    const ed = codeBox(R, savedCode != null ? savedCode : starter, false, true);
+    const CP = panel(R, 'Code');
+    const TP = panel(R, null, 'grow');
+    const ed = codeBox(CP, savedCode != null ? savedCode : starter, false, true);
     S.prac.editor = ed;
     const hints = hintsBlock(it);
     const acts = h('div', 'actions');
@@ -684,19 +696,19 @@
     acts.appendChild(btn('Reset code', 'sec', () => { ed.setValue(starter); if (inTest()) delete S.test.codes[it.id]; else delete Store.data.codes[it.id]; Store.save(); runTests(); if (page) page.run(ed.getValue()); }));
     if (allowMemory() && !it.dom) acts.appendChild(btn('Step through my code in Memory', 'sec', () => openInMemory(ed.getValue(), it.id)));
     let replayEl = null;
-    if (!inTest()) acts.appendChild(btn('Replay', 'sec', () => { if (replayEl) { replayEl.remove(); replayEl = null; } else replayEl = replayPanel(it, R, testsHead); }, 'Replay how you wrote this'));
-    R.appendChild(acts);
+    if (!inTest()) acts.appendChild(btn('Replay', 'sec', () => { if (replayEl) { replayEl.remove(); replayEl = null; } else replayEl = replayPanel(it, CP, null); }, 'Replay how you wrote this'));
+    CP.appendChild(acts);
     const hide = deferFeedback();
-    const testsHead = h('div', 'tests-head'); testsHead.appendChild(h('span', null, 'Tests')); const runState = h('span', 'chip', hide ? 'Results appear when the test ends' : 'Running'); testsHead.appendChild(runState);
-    R.appendChild(testsHead);
+    const testsHead = h('div', 'panel-head tests-head'); testsHead.appendChild(h('span', null, 'Tests')); const runState = h('span', 'chip', hide ? 'Results appear when the test ends' : 'Running'); testsHead.appendChild(runState);
+    TP.appendChild(testsHead);
     const testsEl = h('div', 'tests');
-    R.appendChild(testsEl);
+    TP.appendChild(testsEl);
     const result = h('div');
-    R.appendChild(result);
-    const outEl = h('div'); R.appendChild(outEl);
-    const extras = h('div'); R.appendChild(extras);
+    TP.appendChild(result);
+    const outEl = h('div'); TP.appendChild(outEl);
+    const extras = h('div'); TP.appendChild(extras);
     let review = null, explained = false;
-    const page = it.page ? pageBlock(R, it.prelude, it.id) : null;
+    const page = it.page ? pageBlock(panel(R, null), it.prelude, it.id) : null;
     L.appendChild(hints.el);
     let runId = 0;
     const saveCode = debounce(() => {
@@ -1569,7 +1581,7 @@
     setRow(pin, 'Random theme on each visit', seg([['off', 'Off'], ['light', 'Light themes'], ['dark', 'Dark themes'], ['all', 'All themes']], s.randomTheme || 'off', (v2) => { s.randomTheme = v2; changed(); }));
 
     pin.appendChild(h('h2', 'set-h', 'Text'));
-    setRow(pin, 'Size', seg([[13, '13'], [14, '14'], [15, '15'], [16, '16'], [18, '18'], [20, '20']], s.fontSize, (v2) => { s.fontSize = v2; changed('theme'); }));
+    setRow(pin, 'Size', seg([[13, '13'], [14, '14'], [15, '15'], [16, '16'], [18, '18']], s.fontSize, (v2) => { s.fontSize = v2; changed('theme'); }));
     const bf = h('select', 'plain-select'); [['theme', 'Theme default'], ['System', 'System sans-serif'], ['Georgia', 'Georgia'], ['Charter', 'Charter'], ['Iowan Old Style', 'Iowan Old Style']].forEach(([v2, l]) => bf.appendChild(new Option(l, v2)));
     bf.value = s.bodyFont || 'theme'; bf.addEventListener('change', () => { s.bodyFont = bf.value; changed('theme'); });
     setRow(pin, 'Text font', bf);
@@ -1683,8 +1695,10 @@
     // v3: back to the full-width editor layout with Solarized and the system font, keeping any theme picked by hand.
     if (!st.v || st.v < 3) {
       if (!st.theme || st.theme === 'book') st.theme = 'solarized-auto';
-      st.fontSize = 15; st.bodyFont = 'theme'; st.codeFont = 'theme'; st.layout = 'side'; st.v = 3; Store.save();
+      st.bodyFont = 'theme'; st.codeFont = 'theme'; st.layout = 'side';
     }
+    // v4: the measured redesign uses 14px text, the size LeetCode uses for its problem pages.
+    if (!st.v || st.v < 4) { st.fontSize = 14; st.v = 4; Store.save(); }
   }
   async function boot() {
     loadGenerated();

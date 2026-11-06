@@ -142,10 +142,11 @@
     } else if (o.kind === 'object') {
       box.appendChild(h('div', 'obj-empty', 'no keys'));
     }
-    const phrase = o.isError ? 'an Error object' : o.kind === 'array' ? 'an array, length ' + o.items.length : o.kind === 'set' ? 'a Set' : o.kind === 'function' ? 'a function' : 'an object';
+    // As in Python Tutor, the label sits above the object.
+    const phrase = o.isError ? 'Error object' : o.kind === 'array' ? 'array, length ' + o.items.length : o.kind === 'set' ? 'Set' : o.kind === 'function' ? 'function' : 'object';
     const wrapper = h('div', 'objwrap');
+    wrapper.appendChild(h('div', 'caption', (opts.showAddresses ? 'a' + o.id + ' ' : '') + phrase + (isNew ? ', new' : '')));
     wrapper.appendChild(box);
-    wrapper.appendChild(h('div', 'caption', (opts.showAddresses ? 'a' + o.id + ', ' : '') + phrase + (isNew ? ', new' : '')));
     return wrapper;
   }
 
@@ -161,8 +162,8 @@
       c.appendChild(ref); row.appendChild(c); box.appendChild(row);
     }
     const wrapper = h('div', 'objwrap');
-    wrapper.appendChild(box);
     wrapper.appendChild(h('div', 'caption', 'the frame of ' + e.label + ', kept alive by a closure'));
+    wrapper.appendChild(box);
     return wrapper;
   }
 

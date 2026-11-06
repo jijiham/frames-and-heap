@@ -113,7 +113,7 @@
     // VS Code's defaults on a Mac: the system UI font for the interface and Menlo for code.
     st.setProperty('--font-code', settings.codeFont && settings.codeFont !== 'theme' ? settings.codeFont : (theme.codeFont || 'Menlo, Monaco, "Courier New", monospace'));
     st.setProperty('--font-body', theme.uiFont || '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif');
-    const size = settings.fontSize || 15;
+    const size = settings.fontSize || 14;
     st.setProperty('--size', (size * (theme.scale || 1)) + 'px');
     st.setProperty('--code-size', ((size - 1) * (theme.scale || 1)) + 'px');
     document.documentElement.style.colorScheme = theme.dark ? 'dark' : 'light';
