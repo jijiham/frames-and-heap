@@ -563,7 +563,7 @@
       result.innerHTML = '';
       const r = h('div', 'result ok'); r.appendChild(h('div', 'head', 'That\'s correct.'));
       const n = nextInFlow();
-      if (n) { const a = h('div', 'actions'); a.style.marginTop = '6px'; a.appendChild(btn('Next item ▶', '', () => openItem(n))); r.appendChild(a); }
+      if (n) { const a = h('div', 'actions'); a.style.marginTop = '6px'; a.appendChild(btn('Next item →', '', () => openItem(n))); r.appendChild(a); }
       result.appendChild(r);
       if (aiOn('aiExplain')) explainBlock(it, result, () => it.code);
       harderButton(it, r.querySelector('.actions') || r);
@@ -638,12 +638,12 @@
     set(id, data) { try { const all = JSON.parse(localStorage.getItem(PAGE_STORE_KEY) || '{}'); all[id] = data; localStorage.setItem(PAGE_STORE_KEY, JSON.stringify(all)); } catch (e) {} },
   };
   function pageBlock(parent, prelude, storeId) {
-    const head = h('div', 'panel-head'); head.appendChild(h('span', null, 'The page'));
+    parent.appendChild(h('div', 'panel-head', 'The page'));
     let lastCode = '';
-    head.appendChild(linkBtn('Reload the page', () => api.run(lastCode)));
-    head.appendChild(linkBtn('Clear its storage', () => { pageStore.set(storeId, {}); api.run(lastCode); }));
-    parent.appendChild(head);
     const host = h('div', 'page-host'); parent.appendChild(host);
+    const pacts = h('div', 'actions'); parent.appendChild(pacts);
+    pacts.appendChild(btn('Reload the page', 'sec', () => api.run(lastCode)));
+    pacts.appendChild(btn('Clear its storage', 'sec', () => { pageStore.set(storeId, {}); api.run(lastCode); }));
     const note = h('div'); parent.appendChild(note);
     const out = h('div'); parent.appendChild(out);
     let session = null;
@@ -699,8 +699,9 @@
     if (!inTest()) acts.appendChild(btn('Replay', 'sec', () => { if (replayEl) { replayEl.remove(); replayEl = null; } else replayEl = replayPanel(it, CP, null); }, 'Replay how you wrote this'));
     CP.appendChild(acts);
     const hide = deferFeedback();
-    const testsHead = h('div', 'panel-head tests-head'); testsHead.appendChild(h('span', null, 'Tests')); const runState = h('span', 'chip', hide ? 'Results appear when the test ends' : 'Running'); testsHead.appendChild(runState);
-    TP.appendChild(testsHead);
+    const runState = h('div', 'panel-head tests-count', hide ? 'Tests' : 'Running the tests');
+    TP.appendChild(runState);
+    if (hide) TP.appendChild(h('p', 'reading', 'The results appear when the practice test ends.'));
     const testsEl = h('div', 'tests');
     TP.appendChild(testsEl);
     const result = h('div');
@@ -722,12 +723,11 @@
     async function runTests() {
       const code = ed.getValue();
       const my = ++runId;
-      if (!hide) runState.textContent = 'Running';
       const out = await runItemTests(it, code);
       if (my !== runId) return;
       testsEl.innerHTML = ''; result.innerHTML = ''; outEl.innerHTML = '';
       if (out.parseErr) {
-        if (!hide) runState.textContent = 'Not run';
+        if (!hide) runState.textContent = 'The tests did not run';
         const e = out.parseErr;
         const r = h('div', 'result bad'); r.appendChild(h('div', 'head', 'Line ' + (e.loc ? e.loc.line : '?') + ' has a syntax error: ' + e.message.replace(/\s*\(\d+:\d+\)$/, '') + '. The tests will run again once it\'s fixed.')); result.appendChild(r);
         return;
@@ -741,20 +741,21 @@
       for (const { t, r } of out.rows) {
         const row = h('div', 'test ' + (r.pass ? 'pass' : 'fail'));
         row.appendChild(h('span', 'm', r.pass ? '✓' : '✗'));
-        row.appendChild(h('span', null, t.name));
+        row.appendChild(h('span', 'name', t.name));
         if (!r.pass) {
           const d = h('div', 'detail');
-          d.textContent = r.error ? friendlyError(r.error) : 'Expected ' + r.expected + ', but got ' + r.got + '.';
-          if (allowMemory() && !it.dom) d.appendChild(btn('Step through this test in Memory', 'sec small', () => openInMemory(testProgram(code, t), it.id)));
+          if (r.error) d.textContent = friendlyError(r.error);
+          else { d.appendChild(document.createTextNode('Expected ')); d.appendChild(h('code', null, String(r.expected))); d.appendChild(document.createTextNode(', but got ')); d.appendChild(h('code', null, String(r.got))); d.appendChild(document.createTextNode('.')); }
           row.appendChild(d);
+          if (allowMemory() && !it.dom) { const a = h('div', 'detail'); a.appendChild(btn('Step through this test in Memory', 'sec', () => openInMemory(testProgram(code, t), it.id))); row.appendChild(a); }
         }
         testsEl.appendChild(row);
       }
-      runState.textContent = out.passed + ' of ' + out.total + ' pass';
+      runState.textContent = out.passed === out.total ? (out.total === 1 ? 'The test passes' : 'All ' + out.total + ' tests pass') : out.passed + ' of ' + out.total + ' tests pass';
       if (out.passed === out.total) {
-        const r = h('div', 'result ok'); r.appendChild(h('div', 'head', 'All ' + out.total + ' tests pass.'));
-        const a = h('div', 'actions'); a.style.marginTop = '6px';
-        const n = nextInFlow(); if (n) a.appendChild(btn('Next item ▶', '', () => openItem(n)));
+        const r = h('div', 'result ok');
+        const a = h('div', 'actions');
+        const n = nextInFlow(); if (n) a.appendChild(btn('Next item →', '', () => openItem(n)));
         if (aiOn('aiReview')) {
           if (!review) review = reviewBlock(it, extras, ed, codeChanged);
           if (settings().aiReview === 'auto') review.run();
@@ -922,8 +923,9 @@
   function reviewBlock(it, parent, ed, onApply) {
     const box = h('div', 'review');
     parent.appendChild(box);
-    const head = h('div', 'tests-head'); head.appendChild(h('span', null, 'Code review')); const state = h('span', 'chip', ''); head.appendChild(state);
+    const head = h('div', 'panel-head', ''); head.hidden = true;
     box.appendChild(head);
+    const state = { set textContent(v) { head.hidden = !v; head.textContent = v; } };
     const body = h('div'); box.appendChild(body);
     let lastCode = null;
     async function run() {
@@ -931,7 +933,7 @@
       if (code === lastCode) return;
       lastCode = code;
       body.innerHTML = '';
-      state.textContent = modelName() + ', reviewing';
+      state.textContent = modelName() + ' is reviewing your code';
       const prompt = [
         'You are a senior engineer with excellent taste reviewing a learner\'s JavaScript. The code already passes all of its tests. Suggest at most four edits that a top engineer would make: clearer names, simpler or more idiomatic modern JavaScript, removing redundancy, or handling an edge case the task implies. Every edit must keep all tests passing, must be small, and must be independent of the others. If the code is already excellent, return no edits.',
         'Task: ' + it.spec,
@@ -942,7 +944,7 @@
       try {
         const r = await AI.ask(prompt, { model: settings().aiModel, json: true });
         if (ed.getValue() !== code) { lastCode = null; state.textContent = ''; return; }
-        state.textContent = modelName();
+        state.textContent = 'Code review from ' + modelName();
         const edits = (r && Array.isArray(r.edits) ? r.edits : []).filter(e => e && typeof e.find === 'string' && e.find && typeof e.replace === 'string' && code.split(e.find).length === 2);
         if (r && r.summary) body.appendChild(h('p', null, r.summary));
         if (!edits.length) body.appendChild(h('p', null, 'Claude has no edits to suggest for this code.'));

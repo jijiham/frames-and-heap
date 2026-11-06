@@ -190,12 +190,14 @@ div.CodeMirror span.CodeMirror-matchingbracket { color: inherit; text-decoration
 .hint b { font-weight: 400; color: var(--strong); }
 .tests-head { display: flex; gap: 16px; align-items: baseline; margin: 0 0 8px; }
 .tests { display: grid; gap: 4px; }
-.test { display: grid; grid-template-columns: 20px 1fr; gap: 4px; }
-.test .m { font-family: var(--font-code); }
+.test { display: grid; grid-template-columns: 16px 1fr; column-gap: 8px; row-gap: 6px; padding: 4px 12px; border-radius: var(--r); }
+.test.fail { background: var(--side); padding: 8px 12px; }
+.test .m { font-weight: 600; }
 .test.pass .m { color: var(--ok); }
 .test.fail .m { color: var(--bad); }
-.test .detail { grid-column: 2; font: var(--code-size)/1.5 var(--font-code); color: var(--fg); }
-.test .detail .btn { margin-left: 8px; font-family: var(--font-body); }
+.test .name { color: var(--strong); }
+.test .detail { grid-column: 2; color: var(--strong); }
+.test .detail .btn.sec, .test .detail code { background: var(--bg); }
 .mini-out { font: var(--code-size)/1.5 var(--font-code); white-space: pre-wrap; background: var(--side); border-radius: var(--r); padding: 8px 12px; }
 .navrow { display: flex; justify-content: space-between; margin-top: 24px; }
 
