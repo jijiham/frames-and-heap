@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frames and Heap</title>
+<link rel="stylesheet" href="css/codemirror.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=VT323&display=swap">
+</head>
+<body>
+<div id="app">
+  <nav class="tabbar" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-memory" type="button" aria-selected="true">Memory</button>
+    <button class="tab" role="tab" id="tab-practice" type="button" aria-selected="false">Practice</button>
+    <button class="tab" role="tab" id="tab-map" type="button" aria-selected="false">Contents</button>
+    <button class="tab" role="tab" id="tab-tests" type="button" aria-selected="false">Practice tests</button>
+    <button class="tab" role="tab" id="tab-settings" type="button" aria-selected="false">Settings</button>
+    <button class="tab" role="tab" id="tab-guide" type="button" aria-selected="false">Guide</button>
+    <span class="brand">Frames and Heap</span>
+  </nav>
+  <div class="testbar" id="testbar" hidden></div>
+  <main>
+    <div class="pause-cover" id="pause-cover" hidden><p>The test is paused, and the clock has stopped.</p><button class="btn" type="button" id="resume-btn">Resume</button></div>
+    <section class="view on" id="view-memory" aria-label="Memory"></section>
+    <section class="view" id="view-practice" aria-label="Practice"></section>
+    <section class="view" id="view-map" aria-label="Map"></section>
+    <section class="view" id="view-tests" aria-label="Practice tests"></section>
+    <section class="view" id="view-settings" aria-label="Settings"></section>
+    <section class="view" id="view-guide" aria-label="Guide"></section>
+  </main>
+  <footer class="statusbar">
+    <span class="si" id="st-left"></span>
+    <span class="si" id="st-mid"></span>
+    <span class="si right" id="st-real"></span>
+    <span class="si" id="st-save"></span>
+    <span class="si" id="st-theme"></span>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/acorn@8.14.0/dist/acorn.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="js/runner-core.js"></script>
+<script src="js/dom-core.js"></script>
+<script src="js/interp.js"></script>
+<script src="js/runner.js"></script>
+<script src="js/diagram.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/docs.js"></script>
+<script src="js/themes.js"></script>
+<script src="js/course-js.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
