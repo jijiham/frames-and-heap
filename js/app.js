@@ -9,7 +9,7 @@
   const inline = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
   const DEFAULTS = {
-    theme: 'solarized-auto', customBase: 'solarized-light', customColors: {}, fontSize: 14, codeFont: 'theme', bodyFont: 'theme', layout: 'side', splitMem: 0.42, splitPrac: 0.42,
+    theme: 'solarized-auto', customBase: 'solarized-light', customColors: {}, fontSize: 16, codeFont: 'theme', bodyFont: 'theme', layout: 'side', splitMem: 0.42, splitPrac: 0.42,
     rules: 'main', addresses: true, predict: false, realCheck: true, seed: 42,
     hints: 'auto', memoryLinks: true, level: 'standard', randomTheme: 'off', suggestions: true, docsHover: true, playSpeed: 'normal',
     aiModel: 'opus-high', aiReview: 'ask', aiHints: 'ask', aiExplain: 'ask', aiExpert: 'ask', aiPractice: 'ask',
@@ -48,7 +48,7 @@
     if (cf && cf !== 'theme') loadFont(cf);
     const theme = Themes.resolve(s, darkQuery.matches);
     Themes.apply(theme, Object.assign({}, s, { codeFont: cf && cf !== 'theme' ? '"' + cf + '", Menlo, monospace' : 'theme' }));
-    if (s.bodyFont && s.bodyFont !== 'theme') document.documentElement.style.setProperty('--font-body', s.bodyFont === 'System' ? '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif' : '"' + s.bodyFont + '", Georgia, serif');
+    if (s.bodyFont && s.bodyFont !== 'theme') document.documentElement.style.setProperty('--font-body', s.bodyFont === 'System' ? '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif' : s.bodyFont === 'Inter' ? 'Inter, -apple-system, system-ui, sans-serif' : '"' + s.bodyFont + '", Georgia, serif');
     document.body.classList.toggle('layout-side', s.layout === 'side');
     S.themeName = s.theme === 'solarized-auto' ? 'Solarized (' + (darkQuery.matches ? 'dark' : 'light') + ')' : theme.name;
     setTimeout(() => { refreshEditors(); redrawArrows(); updateStatus(); }, 30);
@@ -1581,11 +1581,11 @@
     setRow(pin, 'Random theme on each visit', seg([['off', 'Off'], ['light', 'Light themes'], ['dark', 'Dark themes'], ['all', 'All themes']], s.randomTheme || 'off', (v2) => { s.randomTheme = v2; changed(); }));
 
     pin.appendChild(h('h2', 'set-h', 'Text'));
-    setRow(pin, 'Size', seg([[13, '13'], [14, '14'], [15, '15'], [16, '16'], [18, '18']], s.fontSize, (v2) => { s.fontSize = v2; changed('theme'); }));
+    setRow(pin, 'Reading text size', seg([[15, '15'], [16, '16'], [17, '17'], [18, '18'], [20, '20']], s.fontSize, (v2) => { s.fontSize = v2; changed('theme'); }));
     const bf = h('select', 'plain-select'); [['theme', 'Theme default'], ['System', 'System sans-serif'], ['Georgia', 'Georgia'], ['Charter', 'Charter'], ['Iowan Old Style', 'Iowan Old Style']].forEach(([v2, l]) => bf.appendChild(new Option(l, v2)));
     bf.value = s.bodyFont || 'theme'; bf.addEventListener('change', () => { s.bodyFont = bf.value; changed('theme'); });
     setRow(pin, 'Text font', bf);
-    const cf = h('select', 'plain-select'); [['theme', 'Theme default'], ['Menlo', 'Menlo'], ['PT Mono', 'PT Mono'], ['SF Mono', 'SF Mono'], ['JetBrains Mono', 'JetBrains Mono'], ['Fira Code', 'Fira Code'], ['IBM Plex Mono', 'IBM Plex Mono'], ['Source Code Pro', 'Source Code Pro']].forEach(([v2, l]) => cf.appendChild(new Option(l, v2)));
+    const cf = h('select', 'plain-select'); [['theme', 'Theme default'], ['JetBrains Mono', 'JetBrains Mono'], ['Menlo', 'Menlo'], ['PT Mono', 'PT Mono'], ['SF Mono', 'SF Mono'], ['JetBrains Mono', 'JetBrains Mono'], ['Fira Code', 'Fira Code'], ['IBM Plex Mono', 'IBM Plex Mono'], ['Source Code Pro', 'Source Code Pro']].forEach(([v2, l]) => cf.appendChild(new Option(l, v2)));
     cf.value = s.codeFont || 'theme'; cf.addEventListener('change', () => { s.codeFont = cf.value; changed('theme'); });
     setRow(pin, 'Code font', cf);
 
@@ -1697,8 +1697,8 @@
       if (!st.theme || st.theme === 'book') st.theme = 'solarized-auto';
       st.bodyFont = 'theme'; st.codeFont = 'theme'; st.layout = 'side';
     }
-    // v4: the measured redesign uses 14px text, the size LeetCode uses for its problem pages.
-    if (!st.v || st.v < 4) { st.fontSize = 14; st.v = 4; Store.save(); }
+    // v5: reading text at 16px, the size MDN, javascript.info, Are.na and Monkeytype use for most of their text.
+    if (!st.v || st.v < 5) { st.fontSize = 16; st.v = 5; Store.save(); }
   }
   async function boot() {
     loadGenerated();

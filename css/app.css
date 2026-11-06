@@ -11,12 +11,12 @@
   --kw: #859900; --str: #2AA198; --num: #D33682; --atom: #B58900; --def: #268BD2; --com: #93A1A1; --prop: #657B83;
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-code: Menlo, Monaco, "Courier New", monospace;
-  --size: 14px; --code-size: 13px;
+  --size: 16px; --ui: 14px; --code-size: 13px;
   --gap: 8px; --r: 8px;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-body { background: var(--side); color: var(--strong); font: var(--size)/1.5 var(--font-body); -webkit-font-smoothing: antialiased; }
+body { background: var(--side); color: var(--strong); font: var(--ui)/1.43 var(--font-body); -webkit-font-smoothing: antialiased; }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -24,7 +24,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 #app { height: 100vh; display: flex; flex-direction: column; }
 main { flex: 1; min-height: 0; overflow: auto; padding: 0 var(--gap) var(--gap); position: relative; }
 h1 { font-size: 20px; font-weight: 600; line-height: 28px; margin: 0 0 12px; }
-h2 { font-size: var(--size); font-weight: 600; line-height: 1.5; margin: 24px 0 8px; }
+h2 { font-size: 16px; font-weight: 600; line-height: 1.5; margin: 24px 0 8px; }
+/* Reading text: 16px at 1.5 and at most 70 characters a line, from MDN, javascript.info and Butterick's 45-90 range. */
+.prac-left p, .prac-left .hint, .rulecard .txt, .rulecard .note, .predict .q, .explain p, .review p, .edit p, .testpage > p, .contents > p, .reading { font-size: var(--size); line-height: 1.5; max-width: 70ch; }
 p { margin: 0 0 12px; }
 code { font-family: var(--font-code); font-size: var(--code-size); background: var(--side); border-radius: 4px; padding: 1px 4px; }
 pre { font: var(--code-size)/1.5 var(--font-code); margin: 0 0 12px; white-space: pre-wrap; }
@@ -104,7 +106,7 @@ div.CodeMirror span.CodeMirror-matchingbracket { color: inherit; text-decoration
 /* Memory */
 .mem-top { margin: 0 0 12px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 .stepline { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
-.stephead { margin: 0; font-size: var(--size); }
+.stephead { margin: 0; font-size: var(--ui); }
 .navlinks { display: inline-flex; gap: 12px; flex-wrap: wrap; }
 .scrub { width: 100%; margin: 8px 0 12px; accent-color: var(--accent); }
 .rulecard .txt, .rulecard .note { margin: 0 0 8px; }
@@ -185,7 +187,7 @@ div.CodeMirror span.CodeMirror-matchingbracket { color: inherit; text-decoration
 .cmp .wrong { color: var(--bad); }
 .hints { display: grid; gap: var(--gap); margin-top: 12px; }
 .hint { margin: 0; padding: 8px 12px; background: var(--side); border-radius: var(--r); }
-.hint b { font-weight: 400; color: var(--fg); }
+.hint b { font-weight: 400; color: var(--strong); }
 .tests-head { display: flex; gap: 16px; align-items: baseline; margin: 0 0 8px; }
 .tests { display: grid; gap: 4px; }
 .test { display: grid; grid-template-columns: 20px 1fr; gap: 4px; }
@@ -254,7 +256,7 @@ main.test-paused #view-practice { visibility: hidden; }
 .sug-why { color: var(--fg); }
 
 /* Settings and Guide, with Monkeytype's filled buttons for every choice */
-.set-h { font-size: var(--size); margin: 32px 0 12px; }
+.set-h { font-size: 16px; margin: 32px 0 12px; }
 .set-h:first-child { margin-top: 0; }
 .set { display: grid; grid-template-columns: 220px auto; justify-content: start; gap: 16px; align-items: center; padding: 4px 0; }
 .set > :first-child { color: var(--strong); }

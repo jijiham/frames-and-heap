@@ -111,11 +111,12 @@
     st.setProperty('--rule', theme.rule || theme.border);
     st.setProperty('--code-bg', theme.side);
     // VS Code's defaults on a Mac: the system UI font for the interface and Menlo for code.
-    st.setProperty('--font-code', settings.codeFont && settings.codeFont !== 'theme' ? settings.codeFont : (theme.codeFont || 'Menlo, Monaco, "Courier New", monospace'));
-    st.setProperty('--font-body', theme.uiFont || '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif');
-    const size = settings.fontSize || 14;
+    // MDN's measured pairing: Inter for text and JetBrains Mono for code, whose letters are drawn to the same height.
+    st.setProperty('--font-code', settings.codeFont && settings.codeFont !== 'theme' ? settings.codeFont : (theme.codeFont || '"JetBrains Mono", Menlo, Monaco, monospace'));
+    st.setProperty('--font-body', theme.uiFont || 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif');
+    const size = settings.fontSize || 16;
     st.setProperty('--size', (size * (theme.scale || 1)) + 'px');
-    st.setProperty('--code-size', ((size - 1) * (theme.scale || 1)) + 'px');
+    st.setProperty('--code-size', (Math.round(size * 0.8125) * (theme.scale || 1)) + 'px');
     document.documentElement.style.colorScheme = theme.dark ? 'dark' : 'light';
     document.documentElement.dataset.dark = theme.dark ? '1' : '0';
   }
